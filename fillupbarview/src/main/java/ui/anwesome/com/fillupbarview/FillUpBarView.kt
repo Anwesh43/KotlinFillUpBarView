@@ -19,7 +19,7 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
         }
         return true
     }
-    class State(var j : Int = 0, var prevScale : Float = 0f, var dir : Int = 0) {
+    data class State(var j : Int = 0, var prevScale : Float = 0f, var dir : Int = 0) {
         val scales : Array<Float> = arrayOf(0f, 0f)
         fun update(stopcb : (Float) -> Unit) {
             scales[j] += dir * 0.1f
@@ -38,6 +38,15 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             if(dir == 0) {
                 dir = (1 - 2 * prevScale.toInt())
                 startcb()
+            }
+        }
+    }
+    data class ContainerState(var n : Int, var j : Int = 0, var dir : Int = 1) {
+        fun incrementCounter() {
+            j += dir
+            if(j == n || j == -1) {
+                dir *= -1
+                j += dir
             }
         }
     }
