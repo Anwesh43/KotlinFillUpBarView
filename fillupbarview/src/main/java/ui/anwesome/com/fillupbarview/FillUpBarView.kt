@@ -55,11 +55,11 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
         }
     }
     data class Animator(var view : View, var animated : Boolean = false) {
-        fun animate(updatecb : () -> Unit) {
+        fun animate(i : Long, updatecb : () -> Unit) {
             if (animated) {
                 try {
                     updatecb()
-                    Thread.sleep(50)
+                    Thread.sleep((50 + (i - 1) * 10) / i)
                     view.invalidate()
                 }
                 catch(ex : Exception) {
@@ -82,11 +82,17 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
     data class FillUpBar(var i : Int) {
         val state = State()
         fun draw(canvas : Canvas, paint : Paint, size : Float, w : Float, h : Float) {
-            paint.color = Color.parseColor("#FF8F00")
             val origY = h - size
             val newY = i * size
             val y = origY + (newY - origY) * state.scales[1]
+            paint.style = Paint.Style.FILL
+            paint.color = Color.parseColor("#FF8F00")
             canvas.drawRect(RectF(0f, y, w * state.scales[0], y + size) , paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = Math.min(w, h) / 50
+            paint.color = Color.parseColor("#0D47A1")
+            paint.strokeCap = Paint.Cap.ROUND
+            canvas.drawRect(RectF(0f, y, w , y + size) , paint)
         }
         fun update(stopcb : (Float) -> Unit) {
             state.update(stopcb)
@@ -106,9 +112,14 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
         fun draw(canvas : Canvas, paint : Paint) {
             val w = canvas.width.toFloat()
             val h = canvas.height.toFloat()
+            var i = 0
             fillUpBars.forEach {
                 val size = (0.8f * h) / n
                 it.draw(canvas, paint, size, w, h)
+                i++
+                if(i > state.j) {
+                    return
+                }
             }
         }
         fun update(stopcb : (Float, Int) -> Unit) {
@@ -127,7 +138,7 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
         fun render(canvas : Canvas, paint : Paint) {
             canvas.drawColor(Color.parseColor("#212121"))
             container.draw(canvas, paint)
-            animator.animate {
+            animator.animate((container.state.j+1).toLong()) {
                 container.update {scale, j ->
                     animator.stop()
                 }
