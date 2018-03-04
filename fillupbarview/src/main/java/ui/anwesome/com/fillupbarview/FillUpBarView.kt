@@ -114,6 +114,24 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             fillUpBars.at(state.j)?.startUpdating(startcb)
         }
     }
+    data class Renderer(var view : FillUpBarView) {
+        val container : FillUpBarContainer = FillUpBarContainer(view.n)
+        val animator : Animator = Animator(view)
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            container.draw(canvas, paint)
+            animator.animate {
+                container?.update {scale, j ->
+                    animator.stop()
+                }
+            }
+        }
+        fun handleTap() {
+            container?.startUpdating {
+                animator.stop()
+            }
+        }
+    }
 }
 fun ConcurrentLinkedQueue<FillUpBarView.FillUpBar>.at(index : Int):FillUpBarView.FillUpBar? {
     var i = 0
