@@ -28,7 +28,7 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
         fun update(stopcb : (Float) -> Unit) {
             scales[j] += dir * 0.1f
             if(Math.abs(scales[j] - prevScale) > 1) {
-                prevScale = scales[j] + dir
+                scales[j] = prevScale + dir
                 j += dir
                 if(j == scales.size || j == -1) {
                     j -= dir
@@ -98,6 +98,11 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
     data class FillUpBarContainer(var n : Int) {
         val fillUpBars : ConcurrentLinkedQueue<FillUpBar> = ConcurrentLinkedQueue()
         val state = ContainerState(n)
+        init {
+            for(i in 0..n-1) {
+                fillUpBars.add(FillUpBar(i))
+            }
+        }
         fun draw(canvas : Canvas, paint : Paint) {
             val w = canvas.width.toFloat()
             val h = canvas.height.toFloat()
@@ -123,14 +128,14 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             canvas.drawColor(Color.parseColor("#212121"))
             container.draw(canvas, paint)
             animator.animate {
-                container?.update {scale, j ->
+                container.update {scale, j ->
                     animator.stop()
                 }
             }
         }
         fun handleTap() {
-            container?.startUpdating {
-                animator.stop()
+            container.startUpdating {
+                animator.start()
             }
         }
     }
