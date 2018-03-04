@@ -6,6 +6,8 @@ package ui.anwesome.com.fillupbarview
 import android.content.*
 import android.view.*
 import android.graphics.*
+import java.util.concurrent.ConcurrentLinkedQueue
+
 class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun onDraw(canvas : Canvas) {
@@ -91,4 +93,35 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             state.startUpdating(startcb)
         }
     }
+    data class FillUpBarContainer(var n : Int) {
+        val fillUpBars : ConcurrentLinkedQueue<FillUpBar> = ConcurrentLinkedQueue()
+        val state = ContainerState(n)
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w = canvas.width.toFloat()
+            val h = canvas.height.toFloat()
+            fillUpBars.forEach {
+                val size = h / n
+                it.draw(canvas, paint, size, w, h)
+            }
+        }
+        fun update(stopcb : (Float, Int) -> Unit) {
+            fillUpBars.at(state.j)?.update {
+                stopcb(it, state.j)
+                state.incrementCounter()
+            }
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            fillUpBars.at(state.j)?.startUpdating(startcb)
+        }
+    }
+}
+fun ConcurrentLinkedQueue<FillUpBarView.FillUpBar>.at(index : Int):FillUpBarView.FillUpBar? {
+    var i = 0
+    forEach {
+        if (i == index) {
+            return it
+        }
+        i++
+    }
+    return null
 }
