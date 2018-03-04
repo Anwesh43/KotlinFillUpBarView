@@ -3,6 +3,7 @@ package ui.anwesome.com.fillupbarview
 /**
  * Created by anweshmishra on 05/03/18.
  */
+import android.app.Activity
 import android.content.*
 import android.view.*
 import android.graphics.*
@@ -101,7 +102,7 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             val w = canvas.width.toFloat()
             val h = canvas.height.toFloat()
             fillUpBars.forEach {
-                val size = h / n
+                val size = (0.8f * h) / n
                 it.draw(canvas, paint, size, w, h)
             }
         }
@@ -131,6 +132,13 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             container?.startUpdating {
                 animator.stop()
             }
+        }
+    }
+    companion object {
+        fun create(activity : Activity) : FillUpBarView {
+            var view = FillUpBarView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
