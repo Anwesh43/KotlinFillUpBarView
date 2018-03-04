@@ -50,4 +50,29 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             }
         }
     }
+    data class Animator(var view : View, var animated : Boolean = false) {
+        fun animate(updatecb : () -> Unit) {
+            if (animated) {
+                try {
+                    updatecb()
+                    Thread.sleep(50)
+                    view.invalidate()
+                }
+                catch(ex : Exception) {
+
+                }
+            }
+        }
+        fun start() {
+            if(!animated) {
+                animated = true
+                view.postInvalidate()
+            }
+        }
+        fun stop() {
+            if(animated) {
+                animated = false
+            }
+        }
+    }
 }
