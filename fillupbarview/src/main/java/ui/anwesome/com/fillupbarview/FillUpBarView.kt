@@ -75,4 +75,20 @@ class FillUpBarView(ctx : Context, var n : Int = 5) : View(ctx) {
             }
         }
     }
+    data class FillUpBar(var i : Int) {
+        val state = State()
+        fun draw(canvas : Canvas, paint : Paint, size : Float, w : Float, h : Float) {
+            paint.color = Color.parseColor("#FF8F00")
+            val origY = h - size
+            val newY = i * size
+            val y = origY + (newY - origY) * state.scales[1]
+            canvas.drawRect(RectF(0f, y, w * state.scales[0], y + size) , paint)
+        }
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
 }
